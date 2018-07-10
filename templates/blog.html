@@ -2,18 +2,21 @@
 
 {% block content %}
     <h1>Blog</h1>
-
-    <hr />
-
-    {% if blog_posts|length == 0 %}
+    {% if blogs|length == 0 %}
     <p>No blog posts yet</p>
     {% else %}
 
         <ul>
-            {% for blog_post in blog_posts %}
-            <li>{{blog_post}}</li>
+            {% for blog in blogs %}
+            <li>
+                <h2>{{blog.title}}</h2>
+                <p>{{blog.body}}</p>
+            </li>
             {% endfor %}
         </ul>
 
     {% endif %}
+
+
+
 {% endblock %}

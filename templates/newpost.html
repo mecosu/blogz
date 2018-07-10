@@ -2,11 +2,21 @@
 
 {% block content %}
     <h1>New Blog Post</h1>
-    <form method='post'>
+    <form method='POST'>
+        <p>
         <label>
-            New Blog Post:
-            <input type="text" name='blog-post' />
+            Title:
+            <br>
+            <input id ='blog-title' type="text" name='title' />
         </label>
+        </p>
+        <p>
+        <label>
+            Blog Post:
+            <br>
+            <input id='blog-body' type="text" name='body' />
+        </label>
+        <p>
         <input type="submit" value='Add Blog Post' />
     </form>
     <hr />
