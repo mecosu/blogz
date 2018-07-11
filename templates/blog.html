@@ -2,15 +2,24 @@
 
 {% block content %}
     <h1>Blog</h1>
-    {% if blogs|length == 0 %}
+    {% if not blogs %}
     <p>No blog posts yet</p>
     {% else %}
 
-        <ul>
+        <ul id = "blog-list">
             {% for blog in blogs %}
             <li>
-                <h2>{{blog.title}}</h2>
-                <p>{{blog.body}}</p>
+                <h2 class = "blog-heading">
+                        <a href="/blog?id={{ blog.id }}">
+                        {{blog.title}}
+                    </a>
+                </h2>
+                <p class = "blog-body-text">
+                        {{blog.body}}
+                </p>
+                <p class = "blog-date-created">
+                    {{blog.date}}
+                </p>
             </li>
             {% endfor %}
         </ul>

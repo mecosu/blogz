@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h2 class = "blog-heading">
+            {{blog_post.title}}
+    </h2>
+    <p class= "blog-date-created">
+           Date posted: {{blog_post.date}}
+    </p>
+    <p class = "blog-body-text">
+            {{blog_post.body}}
+    </p>
+
+
+{% endblock %}
