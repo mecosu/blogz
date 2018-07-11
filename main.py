@@ -6,7 +6,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['DEBUG'] = True    
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 
 db = SQLAlchemy(app)
