@@ -44,7 +44,7 @@ class User(db.Model):
 @app.before_request
 def require_login():
     allowed_routes = ['signup', 'login', 'blog']
-    if request.endpoint not in allowed_routes: # and 'username' not in session:
+    if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -53,7 +53,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
+        if password and user.password == password:
             session['username'] = username
             flash("Logged in")
             return redirect('/newpost')
@@ -62,7 +62,42 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/signup', methods=['POST', 'GET'])
+@app.route('/signup', methods=['POST', 'GET'])    
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify_password = request.form['verify-password']
+
+        if not verify_username(username):
+            username_error = "Please enter a valid username."
+        else: 
+            username_error = ""
+        if not verify_password_length(password):
+            password_valid_error = "Please enter a valid password."
+        else:
+            password_valid_error = ""
+        if not verify_passwords_match(password, verify_password):
+            password_match_error = "Passwords do not match."
+        else:
+            password_match_error = ""
+   
+        if not username_error and not password_valid_error and not password_match_error:
+            existing_user = User.query.filter_by(username=username).first()
+            if not existing_user:
+                username_duplicate_error = "Username not available."
+                new_user = User(username, password)
+                db.session.add(new_user)
+                db.session.commit()
+                session['username'] = username
+                return redirect('/')
+            else:
+                return render_template('signup.html', username_duplicate_error = username_duplicate_error)
+        else:
+            return render_template('signup.html', username_error = username_error, password_valid_error = password_valid_error, password_match_error = password_match_error)
+
+    return render_template('signup.html')
+
 def verify_username(username):
     number_of_characters = len(username)
     if number_of_characters > 3 and number_of_characters < 20:
@@ -80,41 +115,6 @@ def verify_passwords_match(password, verify_password):
     if password == verify_password:
         return True
     return False
-    
-def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        verify_password = request.form['verify_password']
-
-    if not verify_username(username):
-        username_error = "Please enter a valid username."
-    else: 
-        username_error = ""
-    if not verify_password_length(password):
-        password_valid_error = "Please enter a valid password."
-    else:
-        password_valid_error = ""
-    if not verify_passwords_match(password, verify_password):
-        password_match_error = "Passwords do not match."
-    else:
-        password_match_error = ""
-   
-    if not username_error and not password_valid_error and not password_match_error:
-        existing_user = User.query.filter_by(username=username).first()
-        if not existing_user:
-            username_duplicate_error = "Username not available."
-            new_user = User(username, password)
-            db.session.add(new_user)
-            db.session.commit()
-            session['username'] = username
-            return redirect('/')
-        else:
-            return render_template('signup.html', username_duplicate_error = username_duplicate_error)
-    else:
-        return render_template('signup.html', username_error = username_error, password_valid_error = password_valid_error, password_match_error = password_match_error)
-
-    return render_template('signup.html')
 
 @app.route('/logout')
 def logout():
