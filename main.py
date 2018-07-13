@@ -43,8 +43,8 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['signup', 'login', 'blog']
-    if request.endpoint not in allowed_routes and 'username' not in session:
+    allowed_routes = ['/signup', '/login', '/blog',]
+    if request.path not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -53,7 +53,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        if password and user.password == password:
+        if user and user.password == password:
             session['username'] = username
             flash("Logged in")
             return redirect('/newpost')
