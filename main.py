@@ -28,7 +28,7 @@ class Blog(db.Model):
         self.owner = owner
 
     def __repr__(self):
-        return '<Blog %r)>' % (self.title, self.body)
+        return '<Blog %r)>' % (self.title, self.body, self.owner)
 
 class User(db.Model):
 
@@ -43,7 +43,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['/signup', '/login', '/blog',]
+    allowed_routes = ['/signup', '/login', '/blog', '/']
     if request.path not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -90,7 +90,7 @@ def signup():
                 db.session.add(new_user)
                 db.session.commit()
                 session['username'] = username
-                return redirect('/')
+                return redirect('/newpost')
             else:
                 return render_template('signup.html', username_duplicate_error = username_duplicate_error)
         else:
@@ -125,6 +125,7 @@ def logout():
 def add_new_post():
     body = request.form.get('body')
     title = request.form.get('title')
+    owner = User.query.filter_by(username=session['username']).first()
 
     if body == "":
         blog_body_blank_error = "Please fill in the body."
@@ -136,7 +137,7 @@ def add_new_post():
 
     if not blog_title_blank_error and not blog_body_blank_error:
             if request.method == 'POST':
-                new_blog = Blog(title, body)
+                new_blog = Blog(title, body, owner)
                 db.session.add(new_blog)
                 db.session.commit()
                 url = "/blog?id=" + str(new_blog.id)
@@ -152,14 +153,19 @@ def display_blog_posts():
         return render_template('single-post.html', blog_post = blog_post)
 
     blogs = Blog.query.order_by(desc(Blog.datetime))
+    #blogs = Blog.query.order_by(desc(Blog.datetime)).filter_by(owner=owner).all()
     return render_template('blog.html', blogs=blogs)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
 
-    owner = User.query.filter_by(username=session['username']).first()
-    blogs = Blog.query.order_by(desc(Blog.datetime)).filter_by(owner=owner).all()
-    return render_template('blog.html', blogs=blogs)
+    owner_id = request.args.get('user')
+    if (owner_id):
+        user_blogs = Blog.query.filter_by(owner_id = owner_id).all()
+        return render_template('singleUser.html', user_blogs = user_blogs)
+
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
 
 
