@@ -143,22 +143,24 @@ def add_new_post():
                 url = "/blog?id=" + str(new_blog.id)
                 return redirect(url)
     else:
-        return render_template('newpost.html', blog_body_blank_error = blog_body_blank_error, blog_title_blank_error = blog_title_blank_error)
+        return render_template('newpost.html', blog_body_blank_error = blog_body_blank_error, blog_title_blank_error = blog_title_blank_error, logged_in_user = logged_in_user)
 
 @app.route("/blog", methods=['GET', 'POST'])
 def display_blog_posts():
     blog_id = request.args.get('id')
+    owner_id = request.args.get('user')
+    if (owner_id):
+        user_blogs = Blog.query.filter_by(owner_id = owner_id).all()
+        return render_template('singleUser.html', user_blogs = user_blogs)
     if (blog_id):
         blog_post = Blog.query.get(blog_id)
         return render_template('single-post.html', blog_post = blog_post)
 
     blogs = Blog.query.order_by(desc(Blog.datetime))
-    #blogs = Blog.query.order_by(desc(Blog.datetime)).filter_by(owner=owner).all()
     return render_template('blog.html', blogs=blogs)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-
     owner_id = request.args.get('user')
     if (owner_id):
         user_blogs = Blog.query.filter_by(owner_id = owner_id).all()
@@ -166,8 +168,6 @@ def index():
 
     users = User.query.all()
     return render_template('index.html', users=users)
-
-
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():

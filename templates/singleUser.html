@@ -19,6 +19,13 @@
                 </p>
                 <p class = "blog-date-created">
                     {{blog.date}}
+                    <br>
+                    <span class = "written-by">
+                        Written by:      
+                        <a href="/?user={{ blog.owner.id }}">
+                            {{blog.owner.username}}
+                        </a>
+                    </span>
                 </p>
             </li>
             {% endfor %}
